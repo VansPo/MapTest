@@ -16,4 +16,7 @@ demoProvider.setBitmapDecoder(new HttpBitmapDecoder(33198, 22539, "http://b.tile
 tileView.registerProvider(demoProvider);
 ```
 
-That's it!
+## Add marker
+```
+tileView.addPin(new Pin(300, 300, getCircleBitmap()));
+```
