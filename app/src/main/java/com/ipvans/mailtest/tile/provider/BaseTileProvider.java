@@ -77,7 +77,7 @@ public class BaseTileProvider implements TileProvider {
   @Override
   public GridAnchor getGridAnchor() {
     // put (0,0) in the middle of the screen
-    return GridAnchor.TOP_LEFT;
+    return GridAnchor.CENTER;
   }
 
   public int getBufferSize() {

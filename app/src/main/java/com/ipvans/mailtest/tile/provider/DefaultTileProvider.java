@@ -90,7 +90,7 @@ public class DefaultTileProvider extends BaseTileProvider {
 
   @Override
   public Integer[] getTileRangeLimits() {
-    return new Integer[] { 0, 0, 10, 10 };
+    return new Integer[] { -50, -50, 50, 50 };
   }
 
   public void setBitmapDecoder(BitmapDecoder bitmapDecoder) {
