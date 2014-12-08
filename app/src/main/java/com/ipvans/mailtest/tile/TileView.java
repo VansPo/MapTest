@@ -15,8 +15,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.widget.Scroller;
+import com.ipvans.mailtest.tile.pin.Pin;
 import com.ipvans.mailtest.tile.provider.BaseTileProvider;
 import com.ipvans.mailtest.tile.provider.TileProvider;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TileView extends SurfaceView implements SurfaceHolder.Callback {
@@ -26,6 +29,7 @@ public class TileView extends SurfaceView implements SurfaceHolder.Callback {
   final GestureDetector gestureDetector;
 
   final Paint paintBg;
+  final Paint paintDebug;
 
   TileSurfaceDrawThread surfaceDrawThread;
   ViewState state;
@@ -35,6 +39,8 @@ public class TileView extends SurfaceView implements SurfaceHolder.Callback {
   private Scroller scroller;
   private VelocityTracker velocity;
   protected VelocityDecelerator mVelocityDecelerator;
+
+  private List<Pin> pinList;
 
   public TileView(Context context, AttributeSet attrs) {
 
@@ -52,9 +58,16 @@ public class TileView extends SurfaceView implements SurfaceHolder.Callback {
     paintBg.setColor(res.getColor(android.R.color.black));
     paintBg.setStyle(Paint.Style.FILL);
 
+    paintDebug = new Paint();
+    paintDebug.setColor(res.getColor(android.R.color.darker_gray));
+    paintDebug.setStyle(Paint.Style.STROKE);
+
     // create scroller for fling gesture
     scroller = new Scroller(context);
     scroller.setFriction(FRICTION);
+
+    //pinList = new Collections.synchronizedList()(new ArrayList<Pin>());
+    pinList = new ArrayList<Pin>();
   }
 
   public void registerProvider(TileProvider tileProvider) {
@@ -286,12 +299,23 @@ public class TileView extends SurfaceView implements SurfaceHolder.Callback {
       }
       canvas.translate(-snapshot.canvasOffsetX, -snapshot.canvasOffsetY);
 
+      //TODO draw pin layer (check if it will be visible on canvas)
+      drawPinLayer(canvas);
+
       canvas.restore();
     }
 
     private class EmptyTile extends Tile {
       public EmptyTile(int x, int y) {
         super(x, y, state.tileWidth);
+      }
+    }
+
+    private void drawPinLayer(Canvas canvas) {
+      synchronized (pinList) {
+        for (Pin pin : pinList) {
+          canvas.drawBitmap(pin.bitmap, pin.x + snapshot.surfaceOffsetX, pin.y + snapshot.surfaceOffsetY, null);
+        }
       }
     }
   }
@@ -376,6 +400,17 @@ public class TileView extends SurfaceView implements SurfaceHolder.Callback {
       //TODO use mDeltaX and mDeltaY to move your drawing objects around
       boolean rangeChange = state.applySurfaceOffsetRelative(mDeltaX, mDeltaY);
       requestSurfaceRefresh(rangeChange);
+    }
+  }
+
+  public void addPin(Pin pin) {
+    synchronized (pinList) {
+      pinList.add(pin);
+    }
+  }
+  public void removePin(Pin pin) {
+    synchronized (pinList) {
+      pinList.remove(pin);
     }
   }
 }

@@ -1,6 +1,7 @@
 package com.ipvans.mailtest.tile;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 public class Tile {
 
@@ -23,6 +24,10 @@ public class Tile {
     this.yId = yId;
     this.size = size;
     this.cacheKey = createCacheKey(xId, yId);
+  }
+
+  public Rect getRect(int left, int top) {
+    return new Rect(left, top, left + size, top + size);
   }
 
   public static long createCacheKey(int x, int y) {
